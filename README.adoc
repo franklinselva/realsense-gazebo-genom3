@@ -1,0 +1,330 @@
+
+
+// This file was generated from realsense-gazebo.gen by the skeleton
+// template. Manual changes should be preserved, although they should
+// rather be added to the "doc" attributes of the genom objects defined in
+// realsense-gazebo.gen.
+
+= realsense_gazebo component
+shasthamsa@laas.fr
+1.0
+:toc: left
+
+// fix default asciidoctor stylesheet issue #2407 and add hr clear rule
+ifdef::backend-html5[]
+[pass]
+++++
+<link rel="stylesheet" href="data:text/css,p{font-size: inherit !important}" >
+<link rel="stylesheet" href="data:text/css,hr{clear: both}" >
+++++
+endif::[]
+
+
+A GenoM module for realsense gazebo plugin.
+
+
+== Ports
+
+
+[[Frame]]
+=== Frame (multiple out)
+
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Data structure
+[disc]
+ * `struct ::or::sensor::frame` `Frame`
+ ** `struct ::or::time::ts` `ts`
+ *** `long` `sec`
+ *** `long` `nsec`
+ ** `boolean` `compressed`
+ ** `unsigned short` `height`
+ ** `unsigned short` `width`
+ ** `unsigned short` `bpp`
+ ** `sequence< octet >` `pixels`
+
+|===
+
+The image frame from monocular camera.
+
+'''
+
+[[Intrinsics]]
+=== Intrinsics (out)
+
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Data structure
+[disc]
+ * `struct ::or::sensor::intrinsics` `Intrinsics`
+ ** `struct ::or::sensor::calibration` `calib`
+ *** `float` `fx`
+ *** `float` `fy`
+ *** `float` `cx`
+ *** `float` `cy`
+ *** `float` `gamma`
+ ** `struct ::or::sensor::distortion` `disto`
+ *** `float` `k1`
+ *** `float` `k2`
+ *** `float` `k3`
+ *** `float` `p1`
+ *** `float` `p2`
+
+|===
+
+The intrinsics of the camera.
+
+'''
+
+[[Extrinsics]]
+=== Extrinsics (out)
+
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Data structure
+[disc]
+ * `struct ::or::sensor::extrinsics` `Extrinsics`
+ ** `struct ::or::sensor::translation` `trans`
+ *** `float` `tx`
+ *** `float` `ty`
+ *** `float` `tz`
+ ** `struct ::or::sensor::rotation` `rot`
+ *** `float` `roll`
+ *** `float` `pitch`
+ *** `float` `yaw`
+
+|===
+
+The extrinsics of the camera.
+
+'''
+
+== Services
+
+[[start_camera]]
+=== start_camera (activity)
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Throws
+[disc]
+ * `exception ::realsense_gazebo::e_OUT_OF_MEM`
+ ** `short` `code`
+ ** `string<128>` `message`
+
+ * `exception ::realsense_gazebo::e_BAD_GAZEBO_CONFIG`
+ ** `short` `code`
+ ** `string<128>` `message`
+
+ * `exception ::realsense_gazebo::e_PCL_ERROR`
+ ** `short` `code`
+ ** `string<128>` `message`
+
+ * `exception ::realsense_gazebo::e_BAD_CONFIG`
+ ** `short` `code`
+ ** `string<128>` `message`
+
+a|.Context
+[disc]
+  * In task `<<publish>>`
+  (frequency 10.0 _Hz_)
+|===
+
+Start the camera plugin.
+
+'''
+
+[[set_debug]]
+=== set_debug (attribute)
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Inputs
+[disc]
+ * `boolean` `debug` (default `"0"`) Enable debug (default: false)
+
+|===
+
+Set the debug mode.
+
+'''
+
+[[show_image_frames]]
+=== show_image_frames (attribute)
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Inputs
+[disc]
+ * `boolean` `show_frames` (default `"1"`) Enable image frames (default: true)
+
+|===
+
+Show image frames.
+
+'''
+
+[[set_verbose_level]]
+=== set_verbose_level (attribute)
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Inputs
+[disc]
+ * `octet` `verbose_level` (default `"0"`) Verbose level
+
+|===
+
+Set the verbose level.
+
+'''
+
+[[set_intrinsics]]
+=== set_intrinsics (attribute)
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Inputs
+[disc]
+ * `struct ::or::sensor::intrinsics` `intrinsics`: Intrinsics
+ ** `struct ::or::sensor::calibration` `calib`
+ *** `float` `fx`
+ *** `float` `fy`
+ *** `float` `cx`
+ *** `float` `cy`
+ *** `float` `gamma`
+ ** `struct ::or::sensor::distortion` `disto`
+ *** `float` `k1`
+ *** `float` `k2`
+ *** `float` `k3`
+ *** `float` `p1`
+ *** `float` `p2`
+
+|===
+
+Set the intrinsics for the camera.
+
+'''
+
+[[set_extrinsics]]
+=== set_extrinsics (attribute)
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Inputs
+[disc]
+ * `struct ::or::sensor::extrinsics` `extrinsics`: Extrinsics
+ ** `struct ::or::sensor::translation` `trans`
+ *** `float` `tx`
+ *** `float` `ty`
+ *** `float` `tz`
+ ** `struct ::or::sensor::rotation` `rot`
+ *** `float` `roll`
+ *** `float` `pitch`
+ *** `float` `yaw`
+
+|===
+
+Set the extrinsics for the camera.
+
+'''
+
+[[set_horizontal_fov]]
+=== set_horizontal_fov (attribute)
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Inputs
+[disc]
+ * `float` `hfov` (default `"0"`) Horizontal field of view
+
+|===
+
+Set the horizontal field of view.
+
+'''
+
+[[set_resolution]]
+=== set_resolution (function)
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Inputs
+[disc]
+ * `short` `width` (default `"640"`) Image width
+
+ * `short` `height` (default `"480"`) Image height
+
+|===
+
+Set the image resolution.
+
+'''
+
+[[set_compression]]
+=== set_compression (function)
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Inputs
+[disc]
+ * `short` `compression_percent` (default `"-1"`) Compression ration in percentage (0 - 100) (-1 for no compresstion)
+
+|===
+
+Set the compression ratio.
+
+'''
+
+[[stop_camera]]
+=== stop_camera (function)
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Throws
+[disc]
+ * `exception ::realsense_gazebo::e_BAD_CONFIG`
+ ** `short` `code`
+ ** `string<128>` `message`
+
+|===
+
+Stop the camera.
+
+'''
+
+== Tasks
+
+[[publish]]
+=== publish
+
+[role="small", width="50%", float="right", cols="1"]
+|===
+a|.Context
+[disc]
+  * Frequency 10.0 _Hz_
+* Updates port `<<Frame>>`
+* Updates port `<<Intrinsics>>`
+* Updates port `<<Extrinsics>>`
+a|.Throws
+[disc]
+ * `exception ::realsense_gazebo::e_OUT_OF_MEM`
+ ** `short` `code`
+ ** `string<128>` `message`
+
+ * `exception ::realsense_gazebo::e_BAD_GAZEBO_CONFIG`
+ ** `short` `code`
+ ** `string<128>` `message`
+
+ * `exception ::realsense_gazebo::e_PCL_ERROR`
+ ** `short` `code`
+ ** `string<128>` `message`
+
+|===
+
+Publish from Gazebo simulator.
+
+'''

@@ -1,0 +1,17 @@
+
+# pkg-config file for realsense_gazebo interface and codels library
+#
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+datarootdir=@datarootdir@
+idldir=@datadir@/idl
+
+Name: realsense_gazebo-genom3
+Description: realsense_gazebo interface and codels library
+Version: @PACKAGE_VERSION@
+Requires: felix-idl, vision-idl, genom3 >= 2.99.26
+Cflags: -I${includedir} -I${idldir}
+Libs: -L${libdir} -lrealsense_gazebo_codels
+Libs.private: @codels_requires_LIBS@

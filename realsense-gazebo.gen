@@ -1,0 +1,150 @@
+/*
+ * Copyright (c) 2023-2023 LAAS/CNRS
+ *
+ * Author: Selvakumar H S - LAAS/CNRS
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+#pragma require "felix-idl"
+#pragma require "vision-idl"
+
+#include "or/sensor/camera.gen"
+
+// TODO: Add checkerboard detection and calibration
+/* -------------------------- MODULE DECLARATION --------------------------- */
+component realsense_gazebo {
+  version "1.0";
+  email	  "shasthamsa@laas.fr";
+  lang	  "c";
+  require "genom3 >= 2.99.26";
+  doc 	  "A GenoM module for realsense gazebo plugin.";
+
+  codels-require "opencv4, felix-g3utils, vision-idl", "pcl";
+
+  exception e_OPENCV_ERROR { short code; string<128> message; };
+  exception e_OUT_OF_MEM { short code; string<128> message; };
+  exception e_BAD_CONFIG { short code; string<128> message; };
+  exception e_BAD_GAZEBO_CONFIG { short code; string<128> message; };
+  exception e_PCL_ERROR { short code; string<128> message; };
+
+  struct CameraInfo {
+        struct size_s {
+            unsigned short w, h;
+        } size;
+        unsigned short frequency;
+        string<8> format;   // Y8, Y16, RBG8, RGBA8...
+        or::sensor::intrinsics intrinsics;
+        or::sensor::extrinsics extrinsics;
+
+        boolean started;
+        short compression_rate;
+        float hfov;
+  };
+
+  /* -------------------------- IDS --------------------------- */
+  ids {
+    CameraInfo info;
+
+    boolean debug, show_frames;
+    octet image_width, image_height;
+    octet verbose_level;
+  };
+
+  /* ------------- DEFINITION OF PORTS -------------- */
+  // Camera
+  port multiple out or::sensor::frame Frame {
+    doc "The image frame from monocular camera.";
+  };
+  port out or::sensor::intrinsics Intrinsics {
+    doc "The intrinsics of the camera.";
+  };
+  port out or::sensor::extrinsics Extrinsics {
+    doc "The extrinsics of the camera.";
+  };
+
+  /* ------------------ TASK DEFINITION -------------------- */
+  task publish {
+    period 100 ms;
+    doc "Publish from Gazebo simulator.";
+
+    codel<start> camera_start(ids inout info, port out Frame, port out Extrinsics, port out Intrinsics, ids in debug)
+        yield pub, pause::start;
+
+    codel<pub> camera_publish(ids in info, port out Frame, port out Extrinsics, port out Intrinsics, ids in show_frames, ids in debug)
+        yield pub, pause::pub, ether;
+
+    throw e_OUT_OF_MEM, e_BAD_GAZEBO_CONFIG, e_PCL_ERROR;
+  };
+
+  /* ------------------ ACTIVITY DEFINITION --------------------- */
+  activity start_camera() {
+    doc "Start the camera plugin.";
+    task publish;
+    before stop_camera;
+    after set_resolution;
+    validate check_connection(ids in info.started);
+
+    codel<start> StartCamera(ids out info.started)
+        yield ether;
+
+    throws e_BAD_CONFIG;
+  };
+
+
+  /* ------------------ SERVICE DEFINITION: Attributes -------------------- */
+  attribute set_debug(in debug = FALSE : "Enable debug (default: false)" ) {
+    doc "Set the debug mode.";
+  };
+
+  attribute show_image_frames(in show_frames = TRUE : "Enable image frames (default: true)") {
+    doc "Show image frames.";
+  };
+
+  attribute set_verbose_level(in verbose_level = 0 : "Verbose level") {
+    doc "Set the verbose level.";
+  };
+
+  attribute set_intrinsics(in info.intrinsics =: "Intrinsics") {
+    doc "Set the intrinsics for the camera.";
+  };
+
+  attribute set_extrinsics(in info.extrinsics =: "Extrinsics") {
+    doc "Set the extrinsics for the camera.";
+  };
+
+  attribute set_horizontal_fov(in info.hfov = 0.0 : "Horizontal field of view") {
+    doc "Set the horizontal field of view.";
+  };
+
+  /* ------------------ SERVICE DEFINITION: Functions -------------------- */
+
+  function set_resolution(in short width = 640 : "Image width", in short height = 480 : "Image height") {
+    doc "Set the image resolution.";
+    codel SetResolution(local in width, local in height, ids out info.size);
+  };
+
+  function set_compression(in short compression_percent = -1 : "Compression ration in percentage (0 - 100) (-1 for no compresstion)") {
+    doc "Set the compression ratio.";
+    codel SetCompression(local in compression_percent, ids out info.compression_rate);
+  };
+
+  function stop_camera() {
+    doc "Stop the camera.";
+
+    codel StopCamera(ids out info.started);
+
+    throws e_BAD_CONFIG;
+  };
+
+};
